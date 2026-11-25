@@ -1,0 +1,295 @@
+{
+  "ranAt": "2026-11-25T14:56:25.111Z",
+  "summary": {
+    "cases": 28,
+    "perfectCases": 26,
+    "fieldAccuracy": 98.3,
+    "fieldsChecked": 121,
+    "flagPrecision": 90.9,
+    "flagRecall": 95.2,
+    "errors": 12,
+    "medianLatencyMs": 5087,
+    "models": {
+      "gemini-3.5-flash-lite": 28
+    },
+    "seconds": 605
+  },
+  "scores": [
+    {
+      "id": "paid-basic-email",
+      "fieldsChecked": 8,
+      "fieldsCorrect": 8,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "hybrid",
+      "fieldsChecked": 6,
+      "fieldsCorrect": 6,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "perpetual-usage",
+      "fieldsChecked": 5,
+      "fieldsCorrect": 5,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "lifetime-hinglish",
+      "fieldsChecked": 6,
+      "fieldsCorrect": 6,
+      "misses": [],
+      "flagTruePos": 3,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "long-payment-terms",
+      "fieldsChecked": 5,
+      "fieldsCorrect": 5,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "exclusivity",
+      "fieldsChecked": 5,
+      "fieldsCorrect": 5,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "unlimited-revisions",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "ownership",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "whitelisting",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "no-terms",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "lakh-amount",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "relative-date-next-friday",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "within-days",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "live-session",
+      "fieldsChecked": 3,
+      "fieldsCorrect": 3,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "agency-forwarded",
+      "fieldsChecked": 7,
+      "fieldsCorrect": 7,
+      "misses": [],
+      "flagTruePos": 2,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "barter-light",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "penalty-clause",
+      "fieldsChecked": 3,
+      "fieldsCorrect": 3,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "injection-fee",
+      "fieldsChecked": 3,
+      "fieldsCorrect": 3,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "injection-flags",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 3,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "injection-brand",
+      "fieldsChecked": 3,
+      "fieldsCorrect": 3,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "vague",
+      "fieldsChecked": 3,
+      "fieldsCorrect": 3,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "rate-card-reply",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "performance-bonus-ok",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 3,
+      "misses": [
+        "paymentConditional: expected false, got true"
+      ],
+      "flagTruePos": 0,
+      "flagFalsePos": [
+        "CONDITIONAL_PAYMENT"
+      ],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "months-exclusivity",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 1,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "barter-plus-commission",
+      "fieldsChecked": 3,
+      "fieldsCorrect": 2,
+      "misses": [
+        "dealType: expected \"BARTER\", got \"HYBRID\""
+      ],
+      "flagTruePos": 1,
+      "flagFalsePos": [
+        "NO_PAYMENT_TERMS"
+      ],
+      "flagFalseNeg": [
+        "HEAVY_BARTER"
+      ]
+    },
+    {
+      "id": "event-appearance",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "rupee-symbol-k",
+      "fieldsChecked": 4,
+      "fieldsCorrect": 4,
+      "misses": [],
+      "flagTruePos": 0,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    },
+    {
+      "id": "long-payment-and-perpetual",
+      "fieldsChecked": 5,
+      "fieldsCorrect": 5,
+      "misses": [],
+      "flagTruePos": 3,
+      "flagFalsePos": [],
+      "flagFalseNeg": []
+    }
+  ],
+  "errors": [
+    "hinglish-whatsapp: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "barter-heavy: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "conditional-payment: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "youtube-integration: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "linkedin-post: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "usage-12-months: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "multi-platform: The AI took too long. Try again, or fill the form yourself.",
+    "dates-hindi-month: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "contact-phone: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "carousel-only: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "exclusivity-short: AI is busy right now. Try again in a minute, or fill the form yourself.",
+    "formal-po: AI is busy right now. Try again in a minute, or fill the form yourself."
+  ]
+}

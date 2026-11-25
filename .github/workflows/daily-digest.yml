@@ -1,0 +1,25 @@
+name: Daily digest
+
+# Every morning at 08:00 IST (02:30 UTC), ask the app to send each workspace its summary email.
+# Needs two repository secrets: APP_URL (e.g. https://creatordesk.example) and CRON_SECRET (same as the app's).
+# Safe to re-run: the app sends at most one digest per workspace per day.
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger digest
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$APP_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "APP_URL or CRON_SECRET not set; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 120             -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/digest"

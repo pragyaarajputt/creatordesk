@@ -1,0 +1,443 @@
+// CreatorDesk data model.
+// Conventions:
+// - Money is stored as integer paise (₹1 = 100 paise). Never use floats for money.
+// - Percentages are stored as basis points (18% = 1800).
+// - Every tenant-owned row carries workspaceId and is always queried through it (see lib/tenancy.ts).
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../lib/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth.js models ───────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  memberships Member[]
+  auditLogs   AuditLog[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ─── Tenancy ──────────────────────────────────────────────────────────────────
+
+enum WorkspaceType {
+  CREATOR
+  AGENCY
+}
+
+enum MemberRole {
+  OWNER
+  MANAGER
+  VIEWER
+}
+
+model Workspace {
+  id            String        @id @default(cuid())
+  name          String
+  type          WorkspaceType @default(CREATOR)
+  // Supplier details printed on invoices.
+  legalName     String?
+  gstin         String?
+  pan           String?
+  address       String?
+  stateCode     String? // 2-digit GST state code, e.g. "07" for Delhi
+  upiId         String?
+  invoicePrefix String        @default("CD")
+  // AI features are off until an owner turns them on (pasted text goes to Google's Gemini API).
+  aiEnabled     Boolean       @default(false)
+  aiEnabledAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  members         Member[]
+  creators        Creator[]
+  brands          Brand[]
+  deals           Deal[]
+  deliverables    Deliverable[]
+  invoices        Invoice[]
+  invoiceCounters InvoiceCounter[]
+  payments        Payment[]
+  reminders       Reminder[]
+  auditLogs       AuditLog[]
+  invites         Invite[]
+  digestRuns      DigestRun[]
+}
+
+model Member {
+  id          String     @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        MemberRole @default(OWNER)
+  createdAt   DateTime   @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+// Pending access for someone who hasn't signed in yet. Accepted automatically at their next sign-in.
+model Invite {
+  id          String     @id @default(cuid())
+  workspaceId String
+  email       String
+  role        MemberRole @default(MANAGER)
+  invitedById String?
+  acceptedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, email])
+  @@index([email])
+}
+
+// ─── Business data ────────────────────────────────────────────────────────────
+
+enum Platform {
+  INSTAGRAM
+  YOUTUBE
+  LINKEDIN
+  X
+  OTHER
+}
+
+model Creator {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  handle      String?
+  platform    Platform @default(INSTAGRAM)
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deals     Deal[]
+
+  @@index([workspaceId])
+}
+
+model Brand {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  name         String
+  gstin        String?
+  stateCode    String?
+  address      String?
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deals     Deal[]
+
+  @@unique([workspaceId, name])
+}
+
+enum DealStage {
+  PITCHED
+  NEGOTIATING
+  AGREED
+  IN_PRODUCTION
+  POSTED
+  INVOICED
+  PAID
+  LOST
+  CANCELLED
+}
+
+enum DealType {
+  PAID
+  BARTER
+  HYBRID
+}
+
+model Deal {
+  id                String    @id @default(cuid())
+  workspaceId       String
+  creatorId         String?
+  brandId           String
+  title             String
+  stage             DealStage @default(PITCHED)
+  type              DealType  @default(PAID)
+  amountPaise       Int       @default(0) // agreed fee, before GST
+  productValuePaise Int       @default(0) // barter / hybrid product value
+  usageRightsMonths Int?
+  exclusivityDays   Int?
+  paymentTermsDays  Int       @default(30)
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator      Creator?      @relation(fields: [creatorId], references: [id], onDelete: SetNull)
+  brand        Brand         @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  deliverables Deliverable[]
+  invoices     Invoice[]
+  reminders    Reminder[]
+
+  @@index([workspaceId, stage])
+}
+
+enum DeliverableFormat {
+  REEL
+  STORY
+  POST
+  CAROUSEL
+  VIDEO
+  SHORT
+  LIVE
+  OTHER
+}
+
+enum DeliverableStatus {
+  TODO
+  DRAFT_SENT
+  APPROVED
+  POSTED
+}
+
+model Deliverable {
+  id          String            @id @default(cuid())
+  workspaceId String
+  dealId      String
+  platform    Platform          @default(INSTAGRAM)
+  format      DeliverableFormat @default(REEL)
+  dueDate     DateTime?
+  postedUrl   String?
+  status      DeliverableStatus @default(TODO)
+  revisions   Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deal      Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, dueDate])
+}
+
+// ─── Invoicing ────────────────────────────────────────────────────────────────
+
+enum InvoiceKind {
+  TAX_INVOICE // GST-registered supplier
+  BILL_OF_SUPPLY // not registered for GST: no GST charged
+}
+
+enum InvoiceStatus {
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  VOID
+}
+
+// Gap-free invoice numbering: one row per workspace per Indian financial year.
+// The counter is incremented inside the same transaction that creates the invoice.
+model InvoiceCounter {
+  workspaceId   String
+  financialYear String // "2026-27"
+  lastSeq       Int    @default(0)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, financialYear])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  workspaceId   String
+  dealId        String
+  financialYear String
+  seq           Int
+  number        String
+  kind          InvoiceKind
+  status        InvoiceStatus @default(ISSUED)
+  issueDate     DateTime
+  dueDate       DateTime
+  lineItems     Json // [{ description, amountPaise }]
+  subtotalPaise Int
+  gstRateBps    Int           @default(0)
+  cgstPaise     Int           @default(0)
+  sgstPaise     Int           @default(0)
+  igstPaise     Int           @default(0)
+  totalPaise    Int
+  tdsRateBps    Int           @default(0) // expected TDS the brand will deduct
+  voidedAt      DateTime?
+  voidReason    String?
+  supplier      Json // snapshot of workspace details at issue time
+  recipient     Json // snapshot of brand details at issue time
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  workspace Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deal      Deal       @relation(fields: [dealId], references: [id], onDelete: Restrict)
+  payments  Payment[]
+  reminders Reminder[]
+
+  @@unique([workspaceId, financialYear, seq])
+  @@unique([workspaceId, number])
+  @@index([workspaceId, status])
+}
+
+enum PaymentMethod {
+  UPI
+  BANK_TRANSFER
+  CHEQUE
+  CASH
+  OTHER
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  workspaceId String
+  invoiceId   String
+  amountPaise Int // amount actually received
+  tdsPaise    Int           @default(0) // TDS deducted by the brand (counts towards settlement)
+  receivedAt  DateTime
+  method      PaymentMethod @default(UPI)
+  reference   String?
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invoice   Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, receivedAt])
+}
+
+// ─── Reminders and audit ──────────────────────────────────────────────────────
+
+enum ReminderKind {
+  POLITE
+  FIRM
+  FINAL
+}
+
+enum ReminderChannel {
+  WHATSAPP
+  EMAIL
+}
+
+model Reminder {
+  id             String          @id @default(cuid())
+  workspaceId    String
+  dealId         String
+  invoiceId      String
+  kind           ReminderKind
+  channel        ReminderChannel
+  scheduledFor   DateTime
+  sentAt         DateTime?
+  // Unique per invoice + kind + channel, so a double click can never log the same reminder twice.
+  idempotencyKey String          @unique
+  createdAt      DateTime        @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  deal      Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  invoice   Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, scheduledFor])
+  @@index([invoiceId])
+}
+
+// One row per workspace per IST day: the daily digest can never be sent twice.
+model DigestRun {
+  workspaceId String
+  dateKey     String // "YYYY-MM-DD" in IST
+  sentTo      String[]
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, dateKey])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  actorId     String?
+  action      String // e.g. "deal.create", "invoice.issue", "payment.record"
+  entity      String
+  entityId    String
+  before      Json?
+  after       Json?
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor     User?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+}
+
+// ─── Abuse protection ─────────────────────────────────────────────────────────
+
+// Fixed-window counters for rate limits (sign-in emails, waitlist). Keys hold hashed IPs/emails, never raw values.
+model RateLimitBucket {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+
+  @@index([resetAt])
+}
+
+// ─── Marketing ────────────────────────────────────────────────────────────────
+
+model WaitlistEntry {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  handle     String?
+  role       String? // "creator" | "agency" | "other"
+  owedRupees Int? // self-reported amount currently owed by brands
+  createdAt  DateTime @default(now())
+}
