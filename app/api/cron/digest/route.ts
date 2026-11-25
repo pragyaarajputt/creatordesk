@@ -3,10 +3,11 @@ import { emailSender, runDailyDigest } from "@/lib/data/digest";
 import { pruneRateLimits } from "@/lib/security/rate-limit";
 
 /**
- * Daily summary email. Called once a morning by a scheduler (GitHub Actions or a Cloudflare cron),
- * with "Authorization: Bearer <CRON_SECRET>". Safe to call twice: each workspace gets one email per day.
+ * Daily summary email. Called once a morning by a scheduler with "Authorization: Bearer <CRON_SECRET>":
+ * Vercel Cron sends a GET (see vercel.json); the GitHub Actions workflow sends a POST.
+ * Safe to call twice: each workspace gets at most one email per day.
  */
-export async function POST(request: Request) {
+async function handle(request: Request) {
   const secret = process.env.CRON_SECRET;
   const given = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
   // A short secret is guessable; refuse to run with one.
@@ -18,5 +19,8 @@ export async function POST(request: Request) {
   const { send, mode } = emailSender();
   const result = await runDailyDigest(new Date(), send, appUrl);
   const prunedRateLimits = await pruneRateLimits();
-  return Response.json({ mode, ...result, prunedRateLimits });
+  return Response.json({ mode, ...result, prunedRateLimits }, { headers: { "Cache-Control": "no-store" } });
 }
+
+export const GET = handle;
+export const POST = handle;
