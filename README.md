@@ -2,7 +2,9 @@
 
 Track every brand collab from pitch to payment, and get paid on time. Built for Indian creators and talent managers.
 
-**Status:** MVP feature-complete and tested. Ready for a pilot once it's deployed (see [DEPLOY.md](DEPLOY.md)).
+**Live:** https://creatordesk-gray.vercel.app (pilot: sign-in is being set up, so the landing page and waitlist are open for now)
+
+**Status:** MVP feature-complete and tested.
 
 ## Features
 
