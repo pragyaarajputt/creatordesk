@@ -1,6 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["sin1"],
+  "framework": "nextjs",
+  "regions": [
+    "sin1"
+  ],
   "buildCommand": "npm run db:deploy && npm run build",
-  "crons": [{ "path": "/api/cron/digest", "schedule": "30 2 * * *" }]
+  "crons": [
+    {
+      "path": "/api/cron/digest",
+      "schedule": "30 2 * * *"
+    }
+  ]
 }
