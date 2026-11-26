@@ -2,7 +2,11 @@
 
 Track every brand collab from pitch to payment, and get paid on time. Built for Indian creators and talent managers.
 
-**Live:** https://creatordesk-gray.vercel.app (pilot: sign-in is being set up, so the landing page and waitlist are open for now)
+**Live:** https://creatordesk-gray.vercel.app (sign in with Google)
+
+![CreatorDesk demo walkthrough](docs/demo.gif)
+
+▶ [Watch the demo as video (MP4)](docs/demo.mp4)
 
 **Status:** MVP feature-complete and tested.
 
